@@ -19,3 +19,12 @@
 - `js/grader.js` — 채점기 플러그인 자리. `vision` 채점기의 `grade({image, word})`를 구현하고
   `available: true`로 바꾸면 "정답 보기" 때 AI 판단이 제안으로 표시됩니다.
 - `sw.js` — 오프라인 캐시. 파일을 수정하면 `VERSION`을 올려야 폰에 반영됩니다.
+
+## 안드로이드 앱 (APK)
+`android/` 폴더는 웹 파일을 앱 안에 넣어 WebView로 띄우는 안드로이드 프로젝트입니다 (인터넷 없이 동작).
+`main`에 push하면 GitHub Actions(`.github/workflows/android.yml`)가 APK를 만들어 **Releases**에 올립니다.
+
+- 정식 APK를 만들려면 저장소 Settings → Secrets and variables → Actions에
+  `KEYSTORE_BASE64`(서명 키 파일을 base64로), `KEYSTORE_PASSWORD`를 넣어야 합니다.
+  없으면 테스트용(debug) APK만 Actions 결과물(Artifacts)로 만들어집니다.
+- 같은 서명 키로 만든 APK를 설치해야 기존 기록을 유지한 채 업데이트됩니다. 키 파일은 따로 잘 보관하세요.

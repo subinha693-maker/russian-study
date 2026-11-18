@@ -692,7 +692,8 @@ function renderPractice(scrollToWord) {
   initPractice();
   renderMode();
   go('study');
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  // 안드로이드 앱(APK) 안에서는 파일이 이미 앱에 들어 있으므로 오프라인 캐시 불필요
+  if ('serviceWorker' in navigator && location.protocol !== 'file:' && location.hostname !== 'appassets.androidplatform.net') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 })();
