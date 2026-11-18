@@ -4,3 +4,4 @@ app/build/
 app/src/main/assets/
 local.properties
 *.jks
+!signing/release.jks

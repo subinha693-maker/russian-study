@@ -24,7 +24,6 @@
 `android/` 폴더는 웹 파일을 앱 안에 넣어 WebView로 띄우는 안드로이드 프로젝트입니다 (인터넷 없이 동작).
 `main`에 push하면 GitHub Actions(`.github/workflows/android.yml`)가 APK를 만들어 **Releases**에 올립니다.
 
-- 정식 APK를 만들려면 저장소 Settings → Secrets and variables → Actions에
-  `KEYSTORE_BASE64`(서명 키 파일을 base64로), `KEYSTORE_PASSWORD`를 넣어야 합니다.
-  없으면 테스트용(debug) APK만 Actions 결과물(Artifacts)로 만들어집니다.
-- 같은 서명 키로 만든 APK를 설치해야 기존 기록을 유지한 채 업데이트됩니다. 키 파일은 따로 잘 보관하세요.
+- 서명 키는 `android/signing/`에 들어 있습니다 (개인용 앱이라 편의상 저장소에 포함).
+  저장소 Settings → Secrets에 `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`를 넣으면 그 키를 대신 씁니다.
+- 같은 서명 키로 만든 APK를 설치해야 기존 기록을 유지한 채 업데이트됩니다.

@@ -31,27 +31,23 @@ jobs:
       - name: 서명 키 준비
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD_SECRET: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::warning::서명 키(Secrets)가 없어 테스트용(debug) APK만 만듭니다. KEYSTORE_BASE64, KEYSTORE_PASSWORD 를 추가하면 정식 APK가 릴리스에 올라갑니다."
-            echo "SIGNED=false" >> "$GITHUB_ENV"
-          else
+          # Secrets가 있으면 그것을, 없으면 저장소에 들어 있는 키(android/signing)를 사용
+          if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
-            echo "SIGNED=true" >> "$GITHUB_ENV"
+            echo "::add-mask::$KEYSTORE_PASSWORD_SECRET"
+            echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD_SECRET" >> "$GITHUB_ENV"
+          else
+            cp android/signing/release.jks "$RUNNER_TEMP/release.jks"
+            echo "KEYSTORE_PASSWORD=$(cat android/signing/password.txt)" >> "$GITHUB_ENV"
           fi
+          echo "KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
 
       - name: APK 빌드
-        env:
-          KEYSTORE_PATH: ${{ runner.temp }}/release.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          if [ "$SIGNED" = "true" ]; then
-            gradle -p android assembleRelease --no-daemon
-            cp android/app/build/outputs/apk/release/app-release.apk "russian-study-1.0.${{ github.run_number }}.apk"
-          else
-            gradle -p android assembleDebug --no-daemon
-            cp android/app/build/outputs/apk/debug/app-debug.apk "russian-study-1.0.${{ github.run_number }}-test.apk"
-          fi
+          gradle -p android assembleRelease --no-daemon
+          cp android/app/build/outputs/apk/release/app-release.apk "russian-study-1.0.${{ github.run_number }}.apk"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -59,7 +55,6 @@ jobs:
           path: russian-study-*.apk
 
       - name: 릴리스에 올리기 (폰에서 바로 다운로드)
-        if: env.SIGNED == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
